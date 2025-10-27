@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Calculator</title>
+        
+    </head>
+<body bgcolor="#6699FF">
+ 
+    <div class="t">
+
+     <div class="input"><p id="y"></p></p></div>
+
+        <div class="x">   
+        
+        <button class="Symbols" onclick="xx()">AC</button>
+        <button class="Symbols" onclick="back()" >C</button>
+        <button class="Symbols" onclick="root()" >&#8730</button>
+        <button class="Symbols" onclick="btn('/')">/</button>
+
+
+        <button onclick="btn(1)">1</button>
+        <button onclick="btn(2)">2</button>
+        <button onclick="btn(3)">3</button>
+        <button class="Symbols" onclick="btn('*')" >*</button>
+
+
+        <button onclick="btn(4)">4</button>
+        <button onclick="btn(5)">5</button>
+        <button onclick="btn(6)">6</button>
+        <button class="Symbols" onclick="btn('-')">-</button>
+
+        <button onclick="btn(7)">7</button>
+        <button onclick="btn(8)">8</button>
+        <button onclick="btn(9)">9</button>
+        <button class="Symbols" onclick="btn('+')">+</button>
+
+
+        <button class="Symbols" onclick="btn('%')">%</button>
+        <button onclick="btn(0)">0</button>
+        <button class="Symbols" onclick="btn('.')">.</button>
+        <button class="Symbols" onclick="ans()">=</button>
+        </div>
+    </div>
+    <div class="NOTE">
+        <p id="bs"><b><big><em>NOTE:</em></big></b>
+            <ul>
+                <li>To Apply Root Use <b>"$"</b> Key After Value</li>
+                <li>Use <b>"DELETE"</b> Key to Clear Entire Value</li>
+            </ul>
+        </p>
+    </div>
+   <Script>
+    let temp;
+    
+    function btn(a){  
+       document.getElementById("y").innerHTML=document.getElementById("y").innerHTML+a; 
+       his=document.getElementById("y").innerHTML;
+       obj.funValue(his);
+    }
+    function ans(){
+        
+        result=eval(document.getElementById("y").innerHTML);
+        document.getElementById("y").innerHTML=result;
+        obj.funAns(result);
+    }
+    function back(){
+        let x= String (document.getElementById("y").innerHTML);
+        document.getElementById("y").innerHTML=x.slice(0,x.length-1);
+    }
+    function xx(){
+        
+        document.getElementById("y").innerHTML="";
+    }
+    function root(){
+        let value=document.getElementById("y").innerHTML
+        document.getElementById("y").innerHTML=Math.sqrt(value);
+
+    }
+    
+    
+    document.addEventListener("keyup", function clickl(){
+        let a=event.key
+        
+        if(!isNaN(a)||a==='/'||a==='+'||a==='-' ||a==='*'||a==='.'||a==='%'){
+            btn(a);
+        }
+        else if(a==='Enter'){
+            ans();
+        }
+        else if(a === "Backspace"){
+            back();
+        } 
+        else if(a === "Delete"){
+            xx();
+        }   
+        else if(a === '$')
+        {
+            root();
+        }     
+} );
+    
+    
+   </Script>
+ 
+</body>
+</html>
+<style>
+     button{
+        height: 90px;
+        width: 115px;
+        border-radius: 40px;
+        border-style:groove;
+        background-color: #D9D4D0;
+        border-color:rgba(27, 60, 53, 0.765);
+        color: rgb(255, 255, 255);
+        text-shadow: 4px 5px 4px rgb(113, 109, 109), 0 0 40px rgb(104, 104, 116), 0 0 5px rgb(12, 12, 22);
+        font-size: 20px;
+        font-weight:600; 
+        transition: 0.3s;
+  
+    }
+    .x{
+       display: grid;
+       grid-template-columns: 120px 120px 120px 120px; 
+       justify-content: center;
+       gap: 10px;
+       margin-top: 15px;
+       
+    }
+   
+    .input{
+        width:495px;
+        margin: auto;
+        border-style:inset;
+        border-radius: 40px;
+        height: 80px;
+        overflow-wrap: break-word;
+        background-color: #f9ebfd;
+        border-color:rgba(137, 138, 138, 0.765);
+        font-size: 25px;
+        font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+        color: rgb(37, 35, 35);
+     }
+     .t{
+        text-align: center;
+     }
+     .NOTE{
+        background-color: rgba(158, 168, 158, 0.59);
+        width: 475px;
+        margin: auto;
+       overflow-wrap: break-word;
+     }
+     .Symbols{
+        background-color: #B5B4D9
+     }
+     button:hover{
+        background-color: bisque;
+        
+     }
+     .Symbols:hover{
+        background-color: #9290dd
+     }
+</style>
+
+    
