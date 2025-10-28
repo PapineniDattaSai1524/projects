@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Typing Speed Calculator</title>
+    
+    <style>
+        /* * This is the style section, where we make the page look good.
+         * We are using simple 'ID' selectors (like #main-container) 
+         * and 'class' selectors (like .difficulty-btn) to style our HTML.
+         */
+         
+        /* --- Basic Layout & Page Style --- */
+        /* This styles the whole page */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #0f172a; /* Dark blue background */
+            color: #f1f5f9;       /* Light text color */
+            display: flex;            /* This is a magic CSS trick to center things */
+            align-items: center;    /* This centers vertically */
+            justify-content: center;  /* This centers horizontally */
+            min-height: 100vh;        /* Make the page at least as tall as the screen */
+            margin: 0;
+            padding: 1rem;
+        }
+
+        /* This is the main white box that holds everything */
+        #main-container {
+            background-color: #1e293b; /* Lighter blue container */
+            padding: 2rem;
+            border-radius: 1rem; /* Rounded corners */
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25); /* A soft shadow */
+            width: 100%;
+            max-width: 48rem; /* 768px */
+        }
+
+        /* This styles the main title */
+        h1 {
+            font-size: 2rem;
+            font-weight: bold;
+            text-align: center;
+            color: #60a5fa; /* Light blue title */
+            margin-bottom: 1.5rem;
+        }
+
+        /* --- 1. Difficulty Selection Screen --- */
+        /* This styles the box that holds the 'Easy', 'Medium', 'Hard' buttons */
+        #difficulty-selection {
+            text-align: center;
+            padding: 2rem 0;
+        }
+
+        #difficulty-selection h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+        }
+        
+        /* This styles the container for the 3 buttons */
+        #difficulty-buttons {
+            display: flex;
+            flex-direction: column; /* Stack buttons vertically on small screens */
+            gap: 1rem;
+            align-items: center;
+        }
+
+        /* This is a 'class' that styles ALL 3 difficulty buttons */
+        .difficulty-btn {
+            color: white;
+            font-weight: bold;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            border: none;
+            cursor: pointer;
+            width: 50%;
+            min-width: 200px;
+            transition: all 0.2s; /* Smooth hover effect */
+        }
+        .difficulty-btn:hover {
+            opacity: 0.8; /* Fade slightly when hovered */
+        }
+
+        /* Give each button a specific color */
+        #easy-btn { background-color: #166534; /* Green */ }
+        #medium-btn { background-color: #a16207; /* Yellow */ }
+        #hard-btn { background-color: #991b1b; /* Red */ }
+
+
+        /* --- 2. Typing Test Screen --- */
+        
+        /* This styles the 4 boxes: Time, Errors, Backspace, Accuracy */
+        #metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr); /* 2 columns */
+            gap: 1rem;
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        /* This styles each individual box */
+        .metric-box {
+            background-color: #334155; /* Grey-blue */
+            padding: 1rem;
+            border-radius: 0.5rem;
+        }
+
+        /* The small label (like "Time" or "Errors") */
+        .metric-box .label {
+            font-size: 0.875rem;
+            color: #94a3b8; /* Lighter grey text */
+            text-transform: uppercase;
+        }
+
+        /* The big number (like "60" or "0") */
+        .metric-box .value {
+            font-size: 1.875rem;
+            font-weight: bold;
+            display: block; /* Puts it on its own line */
+        }
+        
+        /* Give each number a different color */
+        #timer { color: #93c5fd; }
+        #accuracy { color: #86efac; }
+        #errors { color: #f87171; }
+        #backspace { color: #facc15; }
+        
+        /* This wrapper holds the text-to-type *and* the hidden text area */
+        #text-wrapper {
+            position: relative; /* This is needed to stack things on top of each other */
+            margin-bottom: 1rem;
+        }
+
+        /* The box that shows the sample text (like "The small red boat...") */
+        #text-to-type {
+            background-color: #0f172a; /* Darkest blue */
+            padding: 1rem;
+            border-radius: 0.5rem;
+            color: #94a3b8; /* Grey text */
+            font-size: 1.25rem;
+            line-height: 1.75;
+            min-height: 100px;
+        }
+
+        /* This is the *actual* text area the user types in. It's invisible! */
+        #input-area {
+            position: absolute; /* Place it on top of the #text-to-type box */
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            
+            /* Make it invisible */
+            background: transparent;
+            color: transparent;
+            border: none;
+            outline: none;
+            
+            /* Stop the user from resizing it */
+            resize: none;
+            -moz-appearance: textfield; /* Firefox */
+            
+            /* Style the text inside (even though it's invisible) */
+            padding: 1rem;
+            font-size: 1.25rem;
+            line-height: 1.75;
+            font-family: Arial, sans-serif; /* Match the text display */
+            
+            /* This hides the real blinking cursor (the '|') */
+            caret-color: transparent;
+        }
+
+        /* --- Dynamic classes (added by JavaScript) --- */
+        /* These classes are ADDED and REMOVED by our JavaScript */
+
+        /* Added to correctly typed characters */
+        .correct {
+            color: #22c55e; /* Green */
+        }
+        
+        /* Added to incorrectly typed characters */
+        .incorrect {
+            color: #ef4444; /* Red */
+            text-decoration: underline; /* Underline mistakes */
+        }
+        
+        /* This is our fake, custom-made cursor (the blinking underline) */
+        .cursor {
+            border-bottom: 3px solid #60a5fa; /* Blue underline */
+            animation: blink 1s infinite; /* Make it blink */
+        }
+        /* The animation that makes it blink */
+        @keyframes blink {
+            0%, 100% { border-bottom-color: transparent; } /* Invisible */
+            50% { border-bottom-color: #60a5fa; } /* Visible (Blue) */
+        }
+        
+        /* --- 3. End of Test --- */
+
+        /* The green box that shows "Test Complete!" */
+        #result-message {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background-color: #15803d; /* Green */
+            color: white;
+            text-align: center;
+            border-radius: 0.5rem;
+        }
+
+        /* The box that holds the "Retry" and "Back" buttons */
+        #button-container {
+            text-align: center;
+            min-height: 50px; /* Reserves space so layout doesn't jump */
+            margin-top: 1rem;
+        }
+
+        /* The 'Retry' button */
+        #retry-btn {
+            background-color: #475569; /* Grey */
+            color: white;
+            font-weight: bold;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        #retry-btn:hover {
+            background-color: #334155;
+        }
+        
+        /* The 'Back' button */
+        #back-btn {
+            background-color: #475569; /* Grey */
+            color: white;
+            font-weight: bold;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-right: 0.5rem; /* Add space between it and the Retry button */
+        }
+        #back-btn:hover {
+            background-color: #334155;
+        }
+        
+        /* A helper class to hide things */
+        .hidden {
+            display: none; /* This makes an element invisible and takes up no space */
+        }
+
+        /* --- Responsive Design (for phones) --- */
+        @media (max-width: 640px) {
+            /* On small screens, stack the 4 metric boxes */
+            #metrics-grid {
+                grid-template-columns: 1fr;
+            }
+            .difficulty-btn {
+                width: 80%;
+            }
+        }
+        
+        /* --- Responsive Design (for tablets/desktops) --- */
+        @media (min-width: 640px) {
+            /* On bigger screens, put the 4 metric boxes in a row */
+            #metrics-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+            /* Put difficulty buttons side-by-side */
+            #difficulty-buttons {
+                flex-direction: row;
+                justify-content: center;
+            }
+            .difficulty-btn {
+                width: auto;
+            }
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- The main box holding the entire app -->
+    <div id="main-container">
+        <h1>Typing Speed Calculator</h1>
+
+        <!-- Screen 1: Difficulty Selection -->
+        <!-- This is shown when the page first loads -->
+        <div id="difficulty-selection">
+            <h2>Select Your Difficulty</h2>
+            <div id="difficulty-buttons">
+                <button id="easy-btn" class="difficulty-btn">Easy (60s)</button>
+                <button id="medium-btn" class="difficulty-btn">Medium (60s)</button>
+                <button id="hard-btn" class="difficulty-btn">Hard (90s)</button>
+            </div>
+        </div>
+
+        <!-- Screen 2: The Typing Test -->
+        <!-- This is hidden at the start -->
+        <div id="typing-test-container" class="hidden">
+            
+            <!-- The 4 metric boxes at the top -->
+            <div id="metrics-grid">
+                <div class="metric-box">
+                    <span class="label">Time</span>
+                    <span class="value" id="timer">60</span>
+                </div>
+                <div class="metric-box">
+                    <span class="label">Errors</span>
+                    <span class="value" id="errors">0</span>
+                </div>
+                <div class="metric-box">
+                    <span class="label">Backspace</span>
+                    <span class="value" id="backspace">0</span>
+                </div>
+                <div class="metric-box">
+                    <span class="label">Accuracy</span>
+                    <span class="value" id="accuracy">0%</span>
+                </div>
+            </div>
+
+            <!-- This wrapper holds both the text display and the hidden input area -->
+            <div id="text-wrapper">
+                <!-- This box shows the sample text -->
+                <div id="text-to-type">
+                    <!-- Text characters (as <span>s) will be added here by JavaScript -->
+                </div>
+                
+                <!-- This is the *actual* text area the user types in. -->
+                <textarea id="input-area" autofocus></textarea>
+            </div>
+            
+            <!-- This container holds the "Back" and "Retry" buttons -->
+            <div id="button-container">
+                <button id="back-btn">Back</button>
+                <button id="retry-btn" class="hidden">Retry</button>
+            </div>
+        </div>
+
+        <!-- This box shows the final results. It's hidden at the start. -->
+        <div id="result-message" class="hidden">
+            <!-- Result message will be populated here by JavaScript -->
+        </div>
+
+    </div>
+
+    <!-- JavaScript starts here -->
+    <script>
+        // This line waits for the whole HTML page to load before running any JavaScript.
+        // This is important so we don't try to find buttons that don't exist yet.
+        document.addEventListener('DOMContentLoaded', () => {
+        
+            // --- 1. Constants and Text Samples ---
+            
+            // A 'const' is a variable that never changes.
+            // This is an 'object'. Think of it like a dictionary or a container.
+            // It holds our 3 lists of sample texts.
+            const sampleTexts = {
+                easy: [
+    "Typing every day helps your fingers learn the position of each key. Start slow and focus on accuracy. Steady practice leads to smooth movement and greater confidenc passages later.",
+    "A calm mind makes learning easier and faster. Take deep breaths, relax your shoulders, and let your fingers move with steady rhythm while you build speed and accuracy over repeated practice sessions.",
+    "Practice small typing drills many times each day to build muscle memory. Short repeated effort keeps the mind fresh and helps the hands learn without strain  periods.",
+    "A bright morning routine with light exercise and a short typing session can boost focus. A clear desk and a simple plan help you stay on task and make steady progress with each passing day.",
+    "Reading daily expands vocabulary and improves comprehension. When you type what you read you link sight with motion, which strengthens memory and increases typing ease over time with calm effort.",
+    "A tidy workspace helps concentration and reduces distraction. Keep only what you need, sit with good posture, and let your hands move freely across the keys for a relaxed and steady rhythm.",
+    "Short breaks between practice sets prevent fatigue and keep fingers nimble. Stand up, stretch the hands and wrists, blink slowly, then return to practice with renewed focus and steady strokes.",
+    "Water and rest both help the mind perform well. Drink plain water, take short rests, and allow your eyes and hands to recover so you can return to typing with bright and sharp focus.",
+    "Start each session with warm up lines and gentle motion. Calm, repeatable patterns train the hands and make longer text flow more easily, so you can type with steady rhythm and little hesitation.",
+    "Learning to type without looking at the keys takes time and gentle patience. Trust small gains, track tiny improvements, and let your fingers build a natural path across the keyboard.",
+    "A helpful habit is to set a small daily goal and reward the effort. Achieve a short target, mark the result, and keep building. Little wins add up to large improvements over many weeks.",
+    "Listen to soft instrumental music if it helps focus, but make sure it does not distract. A calm tune can keep tempo steady while your fingers learn to move with precision and ease.",
+    "Teach a friend a simple typing trick to reinforce your own skill. Explaining how to place the hands and move the fingers helps you internalize the correct method and stay confident.",
+    "Choose clear short texts for warm up and longer varied lines for challenge. The mix keeps practice interesting and helps your eyes and hands learn both fluency and careful accuracy.",
+    "A good rest the night before a practice session sharpens recall and reduces errors. Sleep helps consolidate new motor skills so your typing improves more quickly and with less strain.",
+    "Daily writing by typing a short note about what you learned helps memory. Making a practice log links motion with thought and builds a simple habit that supports long term progress.",
+    "Try typing different kinds of text to train varied patterns: lists, short stories, and descriptive lines. This variety builds adaptability andchance getting stuck on one kind of phrase.",
+    "Stay patient when speed does not rise at once. Increase accuracy first and let speed follow. Calm steady repetition builds reliable muscle memory that lasts and feels natural.",
+    "If hands feel tired take a longer break and return later. Small amounts of rest protect joints and keep practice sustainable, making it easy to continue learning over months and years.",
+    "Keep a gentle posture and relaxed wrist position to avoid strain. Type with light pressure, keep shoulders low, and allow the hands to float over the keys in smooth, even motion.",
+    "Use short timed drills to measure progress without pressure. A gentle timer with a small target helps track steady improvement and keeps the mind focused on the present task.",
+    "Try typing short dialogs to train rhythm and pacing. Dialog lines change pattern often and help your fingers adapt to new words, spacing, and punctuation without extra effort.",
+    "Celebrate small improvements and keep a log of practice time. Seeing steady hours accumulate is a strong motivator and a clear reminder that progress is real and worth the effort.",
+    "Practice typing familiar quotes or simple facts to build confidence. Known text is less stressful and allows you to focus on finger motion so speed and accuracy both improve steadily.",
+    "Focus on smooth motion rather than fast strikes. Calm, even keystrokes reduce mistakes and build a steady base for faster typing later, while keeping hands comfortable and relaxed.",
+    "Try alternating hands when typing longer words to balance effort. This simple idea encourages even use of both hands and builds a balanced, efficient typing pattern over time.",
+    "Set an intention before each session: clear goal, short warm up, and one focused skill to improve. Simple planning keeps practice efficient and builds clear results fast without pressure.",
+    "Frame errors as tiny lessons that guide your next practice step. Each mistake shows what to adjust, so use them as helpful signals and keep working with steady, patient focus.",
+    "Typing a short journal each evening helps reflect on the day and trains fluent expression. Small daily notes build both writing skill and keyboard speed through gentle repetition.",
+    "Kindness and calm support steady learning. Treat mistakes with patience, support small gains, and keep practice light and repeatable so progress becomes a natural part of life."
+  ],
+                medium: [
+    "Typing faster comes from consistent practice and steady focus. A clear plan with warm up drills and accuracy checks helps you build skill over time. Keep posture straight and mind calm during every session.",
+    "Progress grows when patience meets regular effort. Each typing session adds another small piece to your improvement. Stay steady, relax your shoulders, and let your hands learn the correct motion naturally.",
+    "Reading aloud before typing can help link sound and rhythm. It trains both mind and fingers to follow natural flow, improving sentence balance and reducing random pauses or breaks in long passages.",
+    "A balanced routine keeps body and mind active. Combine short typing drills with walks or stretching. Physical health supports mental clarity, and together they help you maintain focus for longer hours.",
+    "Confidence in typing arrives with accuracy first. Speed follows once muscle memory develops through repetition. Measure progress weekly to notice improvement that daily effort may hide from view.",
+    "Every person learns at a different pace. Respect your progress and avoid comparing with others. Calm and steady work builds strong habits that lead to lasting skill and genuine comfort with the keyboard.",
+    "Typing full paragraphs instead of single words increases endurance. Longer text builds rhythm, teaches punctuation control, and develops smooth transitions between sentences and varied word lengths.",
+    "Technology rewards those who adapt with curiosity. Each new tool you explore adds to your knowledge. Use digital typing platforms wisely to track speed, accuracy, and consistency across your sessions.",
+    "Setting realistic goals avoids burnout. Aim for gradual growth such as one extra word per minute each week. Slow and steady progress creates confidence that lasts longer than short bursts of pressure.",
+    "When the screen feels dull, take a short break and stretch. Simple movement resets the body and mind, allowing better focus. A few deep breaths renew your energy before continuing your typing practice.",
+    "Typing rhythm improves when both hands share equal effort. Practice words that alternate hands often to build coordination. Smooth flow depends on balanced motion rather than hard pressing on the keys.",
+    "Typing longer passages trains endurance and focus. It also improves reading ability as the eyes learn to scan ahead smoothly. Consistent daily work develops accuracy that feels almost automatic over time.",
+    "Creative writing strengthens typing and imagination at once. When you describe an image or scene through words, your mind and fingers connect meaning with motion, making the practice more enjoyable.",
+    "Discipline is doing the work even when mood is low. Regular effort builds internal strength. Each typing session, however small, brings you one step closer to real mastery of focus and digital expression.",
+    "Avoid rushing through long passages just to finish early. Speed without accuracy creates errors that slow progress later. Train for rhythm, precision, and comfort first, then allow natural speed to rise.",
+    "Consistency outperforms intensity. Typing a few focused minutes each day beats one long and tiring weekend session. Regular repetition builds deeper memory and a sustainable learning pattern that lasts.",
+    "Typing with purpose gives direction to practice. Choose meaningful text that teaches new words or ideas. Purposeful content keeps interest high and encourages thoughtful attention to every line you write.",
+    "Music without lyrics can set a calm pace for typing. Instrumental sound supports steady rhythm while keeping mind relaxed. Background harmony helps prevent tension and improves smooth hand motion.",
+    "Mindful breathing during typing can reduce mistakes. A steady flow of air balances heart rate and keeps nerves calm. Relaxed breath leads to smoother hand movement and clear mental concentration.",
+    "Challenge your limits slowly. Increase typing time in small steps rather than large jumps. Gradual change helps your hands adapt naturally without fatigue and maintains steady growth toward faster speed.",
+    "Clean light, correct screen height, and calm surroundings create ideal typing conditions. Environment affects focus more than most realize, so arrange your workspace to reduce glare and distraction.",
+    "Skill grows when curiosity meets repetition. Explore different languages or writing styles while typing. Variety keeps sessions engaging and strengthens both vocabulary and reaction speed on the keys.",
+    "Balanced hands reduce effort and prevent strain. Keep wrists level, fingers curved, and shoulders relaxed. Light pressure is enough to press each key and allows faster recovery for extended practice.",
+    "Keep an open mind while learning. Each correction teaches something new. A growth attitude transforms mistakes into progress, creating a positive cycle that fuels continued motivation and steady focus.",
+    "Precision builds confidence. Every accurate word adds to trust in your skill. Small details like spacing and punctuation matter, for they create the foundation of clean and professional communication.",
+    "Try new text each week to avoid monotony. Fresh sentences force your brain to adapt and prevent automatic motion. Learning remains sharp only when challenge and curiosity walk side by side each day.",
+    "A short daily reflection after typing can help notice small errors and habits. Review patterns and adjust posture or technique. Continuous self feedback leads to steady progress in skill and awareness.",
+    "Digital learning offers endless tools for typing mastery. Use progress charts and games to stay motivated. Visual records of improvement encourage patience and consistent effort throughout your journey.",
+    "Clear goals guide each typing session toward purpose. Write them down before starting. A focused plan directs energy, keeps distractions low, and makes progress visible over weeks and months of work.",
+    "Typing well is a lifelong skill that saves time and improves clarity. Every letter pressed with care strengthens connection between thought and action, making communication faster and more natural."
+  ],
+                hard: [
+    "Typing at an advanced level is not simply a test of speed but a measure of control, rhythm, and endurance. When your fingers move in harmony with thought, the keyboard becomes an extension of the mind, translating complex ideas into clear digital expression with precision and flow.",
+    "Excellence in typing mirrors excellence in thought. The ability to produce coherent and well paced text requires discipline, patience, and deep concentration. True mastery lies in balancing accuracy with creativity while maintaining calm awareness of rhythm and structure.",
+    "The process of mastering any complex skill, such as typing or writing, depends on deliberate practice. Each repetition strengthens the neural connections responsible for coordination and recall, eventually creating a natural fluency that transforms effort into effortless precision.",
+    "Concentration during typing is a form of meditation. Each keystroke reflects focus and intention. When distractions fade and the hands follow thought without pause, a peaceful rhythm emerges, linking motion and meaning through quiet awareness and consistent effort.",
+    "The evolution of digital communication depends on clarity of expression. Typing acts as the bridge between imagination and understanding. Every sentence typed with care becomes a building block of knowledge that connects people across distance, culture, and time.",
+    "Complex ideas often lose power when expressed carelessly. The art of typing lies not only in speed but in the ability to preserve meaning through precision. A well placed comma or pause can transform confusion into clarity, shaping how the reader feels and interprets the message.",
+    "Human progress is built on information shared through text. Each document typed contributes to the ongoing record of discovery, learning, and memory. The keyboard is a modern pen, and every practiced hand carries the potential to shape the direction of communication itself.",
+    "Typing long and detailed passages demands mental endurance similar to athletic training. As muscles learn timing and rhythm, the mind learns patience. The combined result is a calm flow that converts scattered ideas into coherent written form without hesitation or strain.",
+    "True productivity arises from structured focus. Typing requires the same mindset as steady breathing or measured movement in sport. When flow is achieved, effort feels smooth and results improve naturally through momentum, awareness, and attention to consistent detail.",
+    "Complex sentences test both coordination and comprehension. Each word carries weight in meaning and structure. By practicing intricate phrases, you train the mind to manage information efficiently while maintaining rhythm, precision, and logical connection throughout the text.",
+    "Knowledge is not power unless it can be expressed clearly. The ability to type well enables faster translation of ideas into visible form, reducing delay between inspiration and creation. Clear written language allows innovation to travel farther and influence more minds.",
+    "Typing mirrors language itself: systematic, expressive, and bound by rhythm. The physical movement of keys forms patterns that mirror the flow of spoken tone. Mastery comes from uniting logic and art so the mechanical act of typing becomes a creative and thoughtful performance.",
+    "Endurance typing transforms short bursts of attention into sustained flow. It teaches control of posture, breathing, and pacing. Over time, the body adapts to the rhythm and the mind learns to maintain clarity even through long sessions of concentrated digital writing.",
+    "Discipline is the silent partner of every skilled typist. It thrives not on speed alone but on precision repeated over many hours. Through mindful routine, the ordinary act of pressing keys becomes a path toward mental focus and greater self awareness in daily work.",
+    "Typing complex material improves reading comprehension. As you process information line by line, the brain synchronizes eye movement with motor rhythm. This coordination enhances both understanding and memory, creating a full body engagement with written knowledge.",
+    "Language evolves through those who practice it deeply. Every typist who refines clarity and pace contributes to the ongoing development of digital communication, shaping a world where written interaction remains as expressive and precise as spoken conversation.",
+    "Patience remains the foundation of advanced skill. Rushing leads to mistakes and tension. True expertise in typing emerges when precision replaces haste and calm repetition creates confidence strong enough to sustain long hours of focused creative output.",
+    "Typing is a gateway to clear thought. Each session trains not only the hands but also the ability to structure ideas logically. The more one types with awareness and intention, the more natural it becomes to express complex reasoning with accuracy and graceful rhythm.",
+    "Mastery requires constant feedback. Review your progress, notice recurring errors, and adjust technique without frustration. Improvement follows observation, and observation grows stronger with quiet consistency and trust in steady long term dedication to learning.",
+    "Typing, like music, depends on tempo and phrasing. Too fast and mistakes multiply, too slow and flow is lost. The skilled typist finds balance, letting the words unfold with measured rhythm that matches the pulse of thought and breath in calm synchronization.",
+    "To type well under pressure is to control both mind and body. When deadlines loom, clarity often fades. Training under varied conditions builds resilience, ensuring that precision and calm remain even when urgency or fatigue threaten to break focus and accuracy.",
+    "Language is a living system, and typing serves as its mechanical voice. Each paragraph crafted with care preserves knowledge and emotion. Through repetition and rhythm, ideas that begin as abstract thought become durable written forms shared across the digital world.",
+    "Typing for long periods requires ergonomic awareness. Proper chair height, wrist support, and lighting preserve health. Comfort allows concentration to deepen, so endurance grows naturally without strain or distraction throughout each focused writing session.",
+    "The finest typists are not those who move fastest but those who balance speed with reflection. Each sentence typed with attention carries intention, clarity, and respect for meaning, ensuring communication remains effective and thoughtful in every context.",
+    "Advanced typing integrates reading, listening, and thinking into one seamless process. The mind anticipates the next word while fingers execute the current one. This harmony between cognition and motion defines mastery and deepens overall communication skill.",
+    "Precision in writing depends on care at the smallest scale. Every symbol, space, and pause matters. The trained typist respects these details, knowing that the beauty of language often resides in subtle balance rather than in grand or rapid expression alone.",
+    "Typing complex ideas develops analytical ability. As hands move through long structured arguments, the brain learns to organize concepts clearly. Practice transforms scattered thought into ordered knowledge expressed through steady and deliberate motion.",
+    "Consistency in training leads to freedom in creation. Once technique becomes automatic, attention can shift to content. This liberation of focus allows imagination to guide the process, turning simple mechanical typing into genuine creative communication.",
+    "The discipline of daily typing reflects the larger principle of steady growth. Progress is invisible at first but accumulates through time. Each line adds to the foundation of skill that supports more complex, fluent, and meaningful digital expression later.",
+    "Mastery is a quiet achievement. The most skilled typists rarely seek attention. Their strength lies in seamless precision, where each keystroke aligns with thought so perfectly that typing disappears and only clear communication remains visible to the reader."
+  ]
+            };
+
+            // --- 2. Get References to HTML Elements ---
+            // We 'get' all the important HTML elements and store them in variables.
+            // This lets us control them with JavaScript (like hide, show, or change text).
+            
+            // Screens
+            const difficultySelectionScreen = document.getElementById('difficulty-selection');
+            const typingTestScreen = document.getElementById('typing-test-container');
+            
+            // Difficulty Buttons
+            const easyButton = document.getElementById('easy-btn');
+            const mediumButton = document.getElementById('medium-btn');
+            const hardButton = document.getElementById('hard-btn');
+
+            // Test Area Elements
+            const textDisplayBox = document.getElementById('text-to-type');
+            const hiddenTypingArea = document.getElementById('input-area');
+            
+            // Metric Displays (the text for "Time", "Errors", etc.)
+            const timerText = document.getElementById('timer');
+            const errorsText = document.getElementById('errors');
+            const backspaceText = document.getElementById('backspace');
+            const accuracyText = document.getElementById('accuracy');
+            
+            // Result/Retry Elements
+            const retryButton = document.getElementById('retry-btn');
+            const resultMessageBox = document.getElementById('result-message');
+            const backButton = document.getElementById('back-btn');
+
+
+            // --- 3. State Variables ---
+            // 'let' means these are variables that CAN change.
+            // We use these to remember the "state" of the game (what's happening).
+            
+            let timeLimit = 60;          // Default time. This will change based on difficulty.
+            let countdownTimer;          // This will hold our 1-second timer.
+            let secondsLeft = 0;         // How many seconds are left on the clock.
+            let isTestRunning = false;   // Is the test active? (true/false)
+            let charactersTypedSoFar = 0;// Total characters the user has typed.
+            let totalErrors = 0;         // Number of incorrect characters.
+            let totalBackspaces = 0;     // Number of times backspace was pressed.
+            let currentTextToType = "";  // The sample text for the current test.
+            let selectedDifficulty = "easy"; // The chosen difficulty.
+
+
+            // --- 4. Core Functions ---
+            // Functions are blocks of code we can "call" (run) whenever we need to.
+
+            /**
+             * Shows the difficulty selection screen and hides the test.
+             * This is the starting point and also where the "Retry" and "Back" buttons lead.
+             */
+            function showDifficultyScreen() {
+                // Stop the 1-second countdown timer, just in case it's running.
+                clearInterval(countdownTimer); 
+                isTestRunning = false; // The test is no longer running.
+                
+                // Hide the test and result elements by adding the ".hidden" class.
+                resultMessageBox.classList.add('hidden');
+                typingTestScreen.classList.add('hidden');
+                retryButton.classList.add('hidden');
+                backButton.classList.add('hidden');
+                
+                // Show the difficulty selection screen by removing the ".hidden" class.
+                difficultySelectionScreen.classList.remove('hidden');
+            }
+            
+            /**
+             * Hides the difficulty screen and starts a new test.
+             * Called when a difficulty button is clicked.
+             */
+            function startTest(difficulty) {
+                // 1. Remember which difficulty was chosen.
+                selectedDifficulty = difficulty; 
+                
+                // 2. Set the time limit.
+                if (difficulty === 'hard') {
+                    timeLimit = 90; // Hard mode is 90 seconds.
+                } else {
+                    timeLimit = 60; // Easy and Medium are 60 seconds.
+                }
+                
+                // 3. Hide the difficulty screen.
+                difficultySelectionScreen.classList.add('hidden');
+                
+                // 4. Show the typing test screen.
+                typingTestScreen.classList.remove('hidden');
+                
+                // 5. Show the "Back" button.
+                backButton.classList.remove('hidden');
+                
+                // 6. Reset all counters and load a new text.
+                resetTest(); 
+            }
+
+            /**
+             * Resets all variables and UI elements for a new test.
+             */
+            function resetTest() {
+                // Stop the timer.
+                clearInterval(countdownTimer);
+                isTestRunning = false;
+                
+                // Reset all our "memory" variables back to their starting values.
+                secondsLeft = timeLimit; 
+                charactersTypedSoFar = 0;
+                totalErrors = 0;
+                totalBackspaces = 0; 
+
+                // Reset the text on the screen.
+                timerText.innerText = secondsLeft; 
+                errorsText.innerText = '0';
+                backspaceText.innerText = '0';
+                accuracyText.innerText = '0%';
+                
+                // Clear the (invisible) text area.
+                hiddenTypingArea.value = '';
+                // Re-enable the text area so the user can type in it.
+                hiddenTypingArea.disabled = false;
+                
+                // Hide the result/retry buttons.
+                resultMessageBox.classList.add('hidden');
+                retryButton.classList.add('hidden');
+                
+                // Make sure the "Back" button is visible.
+                backButton.classList.remove('hidden');
+
+                // Load a new paragraph.
+                loadNewText(); 
+                
+                // Automatically "click" the invisible text area.
+                // This lets the user start typing right away without clicking first.
+                hiddenTypingArea.focus();
+            }
+
+            /**
+             * Selects a random text and fills the display area.
+             */
+            function loadNewText() {
+                // 1. Get the list of texts for the chosen difficulty.
+                const texts = sampleTexts[selectedDifficulty];
+                
+                // 2. Pick a random number.
+                // Math.random() gives a random number like 0.123
+                // We multiply by the list length, then Math.floor() cuts off the decimal.
+                const randomIndex = Math.floor(Math.random() * texts.length);
+                
+                // 3. Get the random text from the list.
+                currentTextToType = texts[randomIndex];
+                
+                // 4. Clear out any old text from the display box.
+                textDisplayBox.innerHTML = '';
+                
+                // 5. Turn the text string into a list of single characters.
+                // "Hi" -> ["H", "i"]
+                const characters = currentTextToType.split('');
+                
+                // 6. Loop through each character in the new list.
+                characters.forEach((char, index) => {
+                    // Create a new HTML element called <span>
+                    const span = document.createElement('span');
+                    // Put the character inside the <span>. e.g. <span>H</span>
+                    span.innerText = char;
+                    
+                    // If it's the very first character (index 0), add the 'cursor' class.
+                    if (index === 0) {
+                        span.classList.add('cursor'); 
+                    }
+                    
+                    // Add the new <span> to the display box.
+                    textDisplayBox.appendChild(span);
+                });
+            }
+
+            /**
+             * This function is called EVERY time the user types a key.
+             * This is the main "engine" of the app.
+             */
+            function checkTyping() {
+                // If the test is over, don't do anything.
+                if (!isTestRunning && secondsLeft === 0) return;
+
+                // Get everything the user has typed so far from the invisible text area.
+                const typedText = hiddenTypingArea.value; 
+                const textLength = typedText.length;
+
+                // 1. Start the timer
+                // We only start it if it's not already running AND
+                // the user is typing (not just backspacing).
+                if (!isTestRunning && textLength > charactersTypedSoFar) { 
+                    beginCountdown();
+                }
+
+                // Get all the character <span>s we created earlier.
+                const textSpans = textDisplayBox.querySelectorAll('span');
+                
+                // Update our count of typed characters.
+                charactersTypedSoFar = textLength;
+                let currentErrors = 0; // Reset error count for this check
+                let currentCursorPos = charactersTypedSoFar; // Where the cursor should be
+
+                // 2. Loop through each <span>
+                textSpans.forEach((span, index) => {
+                    const typedChar = typedText[index]; // The character the user typed
+                    const sourceChar = span.innerText;  // The correct character
+
+                    // Clear any old styling (correct, incorrect, cursor)
+                    span.className = '';
+
+                    if (typedChar === undefined) {
+                        // This character hasn't been typed yet. Do nothing.
+                    } else if (typedChar === sourceChar) {
+                        // This character is correct! Add the 'correct' class (makes it green).
+                        span.classList.add('correct');
+                    } else {
+                        // This character is wrong. Add the 'incorrect' class (makes it red).
+                        span.classList.add('incorrect');
+                        currentErrors++; // Add to the error count
+                    }
+                });
+
+                // 3. Update the cursor position
+                // Add the 'cursor' class to the *next* character to be typed.
+                if (currentCursorPos < textSpans.length) {
+                    textSpans[currentCursorPos].classList.add('cursor');
+                }
+
+                // 4. Update the metrics display
+                totalErrors = currentErrors;
+                errorsText.innerText = totalErrors;
+                updateAccuracy(); // Recalculate and show the new accuracy
+
+                // 5. Check if the user has finished typing the entire text
+                if (charactersTypedSoFar === currentTextToType.length) {
+                    finishTest(); // End the test (even if time isn't up)
+                }
+            }
+            
+            /**
+             * This function is called when the user presses a key *down*.
+             * We use it to count backspaces.
+             */
+            function checkKeypress(event) {
+                // We only care about 'Backspace' and only if the test is running.
+                if (event.key === 'Backspace' && isTestRunning) {
+                    totalBackspaces++; // Add to the backspace count
+                    backspaceText.innerText = totalBackspaces; // Update the display
+                    
+                    // We must recalculate accuracy because backspace adds a penalty.
+                    updateAccuracy(); 
+                }
+            }
+
+            /**
+             * Calculates and updates the accuracy display.
+             */
+            function updateAccuracy() {
+                // 1. Get standard accuracy: (correct / total)
+                const correctTyped = charactersTypedSoFar - totalErrors;
+                // Check if totalTyped is 0 to avoid dividing by zero.
+                const accuracyPercent = charactersTypedSoFar === 0 ? 0 : (correctTyped / charactersTypedSoFar) * 100;
+                
+                // 2. Our custom penalty: -0.5% for each backspace
+                const backspacePenalty = totalBackspaces * 0.5;
+                
+                // 3. Calculate final accuracy.
+                // Math.max(0, ...) ensures the accuracy never goes below 0%.
+                const finalAccuracy = Math.max(0, accuracyPercent - backspacePenalty);
+                
+                // 4. Update the display with a rounded number (e.g., 95%).
+                accuracyText.innerText = `${Math.round(finalAccuracy)}%`;
+            }
+
+            /**
+             * Starts the 1-second countdown timer.
+             */
+            function beginCountdown() {
+                isTestRunning = true; // The test is now running!
+                
+                // 'setInterval' is a JavaScript command that runs a function
+                // every X milliseconds. (1000ms = 1 second)
+                countdownTimer = setInterval(() => {
+                    secondsLeft--; // Subtract 1 from the time
+                    timerText.innerText = secondsLeft; // Update the display
+                    
+                    // When time runs out...
+                    if (secondsLeft === 0) {
+                        finishTest(); // End the test
+                    }
+                }, 1000); 
+            }
+
+            /**
+             * Ends the test when the timer runs out or user finishes.
+             */
+            function finishTest() {
+                // Stop the 1-second timer.
+                clearInterval(countdownTimer);
+                isTestRunning = false;
+                
+                // Disable the invisible text area so the user can't type anymore.
+                hiddenTypingArea.disabled = true;
+
+                // Hide the "Back" button (test is over).
+                backButton.classList.add('hidden');
+
+                // Remove the final cursor.
+                const cursorSpan = textDisplayBox.querySelector('.cursor');
+                if (cursorSpan) {
+                    cursorSpan.classList.remove('cursor');
+                }
+
+                // --- Calculate Final Stats ---
+                const finalAccuracy = accuracyText.innerText;
+                const finalErrors = totalErrors;
+                const finalBackspace = totalBackspaces;
+                const finalTypedChars = charactersTypedSoFar;
+                const totalSourceChars = currentTextToType.length;
+                const correctTyped = finalTypedChars - finalErrors;
+                
+                // Calculate the actual time spent.
+                const timeSpent = timeLimit - secondsLeft;
+
+                // Calculate CPM (Characters Per Minute).
+                // Convert time to minutes (e.g., 60s -> 1.0m, 90s -> 1.5m).
+                const timeSpentInMinutes = timeSpent / 60;
+                // CPM = (Correct Characters) / (Time in Minutes)
+                const cpm = (timeSpentInMinutes > 0) ? Math.round(correctTyped / timeSpentInMinutes) : 0;
+
+                // Calculate the "Attempt" percentage (how much of the text they finished).
+                const finalCharsPercentage = totalSourceChars > 0 ? 
+                    Math.round((finalTypedChars / totalSourceChars) * 100) : 0;
+
+                // Create the HTML for the result message.
+                resultMessageBox.innerHTML = `
+                    <strong style="font-size: 1.25rem;">Test Complete!</strong><br>
+                    <div style="text-align: left; display: inline-block; margin-top: 1rem; line-height: 1.75;">
+                        Time Spent: &nbsp;<strong>${timeSpent}s</strong><br>
+                        CPM: &nbsp;<strong>${cpm}</strong> (Chars Per Minute)<br>
+                        Errors: &nbsp;<strong>${finalErrors}</strong><br>
+                        Backspaces: &nbsp;<strong>${finalBackspace}</strong><br>
+                        Accuracy: &nbsp;<strong>${finalAccuracy}</strong><br>
+                        Attempt: &nbsp;<strong>${finalCharsPercentage}%</strong> (${finalTypedChars} / ${totalSourceChars})
+                    </div>
+                `;
+                
+                // Show the result message and the "Retry" button.
+                resultMessageBox.classList.remove('hidden');
+                retryButton.classList.remove('hidden');
+            }
+
+
+            // --- 5. Event Listeners ---
+            // This is where we "turn on" the buttons by telling them
+            // to listen for clicks.
+            
+            // When a difficulty button is clicked, call the startTest function.
+            easyButton.addEventListener('click', () => startTest('easy'));
+            mediumButton.addEventListener('click', () => startTest('medium'));
+            hardButton.addEventListener('click', () => startTest('hard'));
+            
+            // When the retry or back button is clicked, go to the difficulty screen.
+            retryButton.addEventListener('click', showDifficultyScreen);
+            backButton.addEventListener('click', showDifficultyScreen);
+            
+            // Listen for typing in the invisible text area.
+            hiddenTypingArea.addEventListener('input', checkTyping);
+            // Listen for key presses (like Backspace).
+            hiddenTypingArea.addEventListener('keydown', checkKeypress);
+    
+            // This lets the user click the *visible* text box
+            // to focus the *invisible* text area.
+            textDisplayBox.addEventListener('click', () => {
+                hiddenTypingArea.focus();
+            });
+
+            // --- 6. Initial Setup ---
+            // This is the very first function that runs when the page loads.
+            // It shows the difficulty screen.
+            showDifficultyScreen();
+        });
+    </script>
+</body>
+</html>
+
