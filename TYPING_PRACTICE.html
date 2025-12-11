@@ -6,46 +6,39 @@
     <title>Typing Speed Calculator</title>
     
     <style>
-        /* * This is the style section, where we make the page look good.
-         * We are using simple 'ID' selectors (like #main-container) 
-         * and 'class' selectors (like .difficulty-btn) to style our HTML.
-         */
-         
-        /* --- Basic Layout & Page Style --- */
-        /* This styles the whole page */
+       
         body {
             font-family: Arial, sans-serif;
-            background-color: #0f172a; /* Dark blue background */
-            color: #f1f5f9;       /* Light text color */
-            display: flex;            /* This is a magic CSS trick to center things */
-            align-items: center;    /* This centers vertically */
-            justify-content: center;  /* This centers horizontally */
-            min-height: 100vh;        /* Make the page at least as tall as the screen */
+            background-color: #0f172a; 
+            color: #f1f5f9;       
+            display: flex;            
+            align-items: center;   
+            justify-content: center; 
+            min-height: 100vh;        
             margin: 0;
             padding: 1rem;
         }
 
-        /* This is the main white box that holds everything */
+       
         #main-container {
-            background-color: #1e293b; /* Lighter blue container */
+            background-color: #1e293b; 
             padding: 2rem;
-            border-radius: 1rem; /* Rounded corners */
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25); /* A soft shadow */
+            border-radius: 1rem; 
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25); 
             width: 100%;
             max-width: 48rem; /* 768px */
         }
 
-        /* This styles the main title */
+       
         h1 {
             font-size: 2rem;
             font-weight: bold;
             text-align: center;
-            color: #60a5fa; /* Light blue title */
+            color: #60a5fa;
             margin-bottom: 1.5rem;
         }
 
-        /* --- 1. Difficulty Selection Screen --- */
-        /* This styles the box that holds the 'Easy', 'Medium', 'Hard' buttons */
+       
         #difficulty-selection {
             text-align: center;
             padding: 2rem 0;
@@ -57,15 +50,15 @@
             margin-bottom: 1.5rem;
         }
         
-        /* This styles the container for the 3 buttons */
+      
         #difficulty-buttons {
             display: flex;
-            flex-direction: column; /* Stack buttons vertically on small screens */
+            flex-direction: column; 
             gap: 1rem;
             align-items: center;
         }
 
-        /* This is a 'class' that styles ALL 3 difficulty buttons */
+       
         .difficulty-btn {
             color: white;
             font-weight: bold;
@@ -75,76 +68,72 @@
             cursor: pointer;
             width: 50%;
             min-width: 200px;
-            transition: all 0.2s; /* Smooth hover effect */
+            transition: all 0.2s;
         }
         .difficulty-btn:hover {
-            opacity: 0.8; /* Fade slightly when hovered */
+            opacity: 0.8; 
         }
 
-        /* Give each button a specific color */
-        #easy-btn { background-color: #166534; /* Green */ }
-        #medium-btn { background-color: #a16207; /* Yellow */ }
-        #hard-btn { background-color: #991b1b; /* Red */ }
+       
+        #easy-btn { background-color: #166534;  }
+        #medium-btn { background-color: #a16207; }
+        #hard-btn { background-color: #991b1b;  }
 
 
-        /* --- 2. Typing Test Screen --- */
-        
-        /* This styles the 4 boxes: Time, Errors, Backspace, Accuracy */
+     
         #metrics-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr); /* 2 columns */
+            grid-template-columns: repeat(2, 1fr); 
             gap: 1rem;
             text-align: center;
             margin-bottom: 1.5rem;
         }
 
-        /* This styles each individual box */
+      
         .metric-box {
-            background-color: #334155; /* Grey-blue */
+            background-color: #334155; 
             padding: 1rem;
             border-radius: 0.5rem;
         }
 
-        /* The small label (like "Time" or "Errors") */
+        
         .metric-box .label {
             font-size: 0.875rem;
-            color: #94a3b8; /* Lighter grey text */
+            color: #94a3b8; 
             text-transform: uppercase;
         }
 
-        /* The big number (like "60" or "0") */
+        
         .metric-box .value {
             font-size: 1.875rem;
             font-weight: bold;
-            display: block; /* Puts it on its own line */
+            display: block; 
         }
         
-        /* Give each number a different color */
         #timer { color: #93c5fd; }
         #accuracy { color: #86efac; }
         #errors { color: #f87171; }
         #backspace { color: #facc15; }
         
-        /* This wrapper holds the text-to-type *and* the hidden text area */
+       
         #text-wrapper {
-            position: relative; /* This is needed to stack things on top of each other */
+            position: relative;
             margin-bottom: 1rem;
         }
 
-        /* The box that shows the sample text (like "The small red boat...") */
         #text-to-type {
-            background-color: #0f172a; /* Darkest blue */
+            background-color: #0f172a; 
             padding: 1rem;
             border-radius: 0.5rem;
-            color: #94a3b8; /* Grey text */
+            color: #94a3b8; 
             font-size: 1.25rem;
             line-height: 1.75;
             min-height: 100px;
         }
 
-        /* This is the *actual* text area the user types in. It's invisible! */
+      
         #input-area {
-            position: absolute; /* Place it on top of the #text-to-type box */
+            position: absolute; 
             left: 0;
             top: 0;
             width: 100%;
@@ -156,67 +145,64 @@
             border: none;
             outline: none;
             
-            /* Stop the user from resizing it */
-            resize: none;
-            -moz-appearance: textfield; /* Firefox */
             
-            /* Style the text inside (even though it's invisible) */
+            resize: none;
+            -moz-appearance: textfield; 
+            
+           
             padding: 1rem;
             font-size: 1.25rem;
             line-height: 1.75;
-            font-family: Arial, sans-serif; /* Match the text display */
+            font-family: Arial, sans-serif;
             
-            /* This hides the real blinking cursor (the '|') */
+          
             caret-color: transparent;
         }
 
-        /* --- Dynamic classes (added by JavaScript) --- */
-        /* These classes are ADDED and REMOVED by our JavaScript */
+      
 
-        /* Added to correctly typed characters */
+       
         .correct {
-            color: #22c55e; /* Green */
+            color: #22c55e; 
         }
         
-        /* Added to incorrectly typed characters */
+       
         .incorrect {
-            color: #ef4444; /* Red */
-            text-decoration: underline; /* Underline mistakes */
+            color: #ef4444; 
+            text-decoration: underline;
         }
         
-        /* This is our fake, custom-made cursor (the blinking underline) */
+        
         .cursor {
-            border-bottom: 3px solid #60a5fa; /* Blue underline */
-            animation: blink 1s infinite; /* Make it blink */
+            border-bottom: 3px solid #60a5fa; 
+            animation: blink 1s infinite;
         }
-        /* The animation that makes it blink */
+       
         @keyframes blink {
-            0%, 100% { border-bottom-color: transparent; } /* Invisible */
-            50% { border-bottom-color: #60a5fa; } /* Visible (Blue) */
+            0%, 100% { border-bottom-color: transparent; } 
+            50% { border-bottom-color: #60a5fa; } 
         }
         
-        /* --- 3. End of Test --- */
-
-        /* The green box that shows "Test Complete!" */
+       
         #result-message {
             margin-top: 1.5rem;
             padding: 1rem;
-            background-color: #15803d; /* Green */
+            background-color: #15803d;
             color: white;
             text-align: center;
             border-radius: 0.5rem;
         }
 
-        /* The box that holds the "Retry" and "Back" buttons */
+       
         #button-container {
             text-align: center;
-            min-height: 50px; /* Reserves space so layout doesn't jump */
+            min-height: 50px; 
             margin-top: 1rem;
         }
 
-        /* The 'Retry' button */
+        
         #retry-btn {
-            background-color: #475569; /* Grey */
+            background-color: #475569; 
             color: white;
             font-weight: bold;
             padding: 0.75rem 1.5rem;
@@ -229,9 +215,9 @@
             background-color: #334155;
         }
         
-        /* The 'Back' button */
+        
         #back-btn {
-            background-color: #475569; /* Grey */
+            background-color: #475569; 
             color: white;
             font-weight: bold;
             padding: 0.75rem 1.5rem;
@@ -239,20 +225,20 @@
             border: none;
             cursor: pointer;
             transition: all 0.2s;
-            margin-right: 0.5rem; /* Add space between it and the Retry button */
+            margin-right: 0.5rem; 
         }
         #back-btn:hover {
             background-color: #334155;
         }
         
-        /* A helper class to hide things */
+       
         .hidden {
-            display: none; /* This makes an element invisible and takes up no space */
+            display: none; 
         }
 
-        /* --- Responsive Design (for phones) --- */
+      
         @media (max-width: 640px) {
-            /* On small screens, stack the 4 metric boxes */
+            
             #metrics-grid {
                 grid-template-columns: 1fr;
             }
@@ -261,13 +247,13 @@
             }
         }
         
-        /* --- Responsive Design (for tablets/desktops) --- */
+       
         @media (min-width: 640px) {
-            /* On bigger screens, put the 4 metric boxes in a row */
+           
             #metrics-grid {
                 grid-template-columns: repeat(4, 1fr);
             }
-            /* Put difficulty buttons side-by-side */
+          
             #difficulty-buttons {
                 flex-direction: row;
                 justify-content: center;
@@ -281,12 +267,11 @@
 </head>
 <body>
 
-    <!-- The main box holding the entire app -->
+   
     <div id="main-container">
         <h1>Typing Speed Calculator</h1>
 
-        <!-- Screen 1: Difficulty Selection -->
-        <!-- This is shown when the page first loads -->
+       
         <div id="difficulty-selection">
             <h2>Select Your Difficulty</h2>
             <div id="difficulty-buttons">
@@ -296,11 +281,10 @@
             </div>
         </div>
 
-        <!-- Screen 2: The Typing Test -->
-        <!-- This is hidden at the start -->
+     
         <div id="typing-test-container" class="hidden">
             
-            <!-- The 4 metric boxes at the top -->
+           
             <div id="metrics-grid">
                 <div class="metric-box">
                     <span class="label">Time</span>
@@ -320,42 +304,33 @@
                 </div>
             </div>
 
-            <!-- This wrapper holds both the text display and the hidden input area -->
+           
             <div id="text-wrapper">
-                <!-- This box shows the sample text -->
+                
                 <div id="text-to-type">
-                    <!-- Text characters (as <span>s) will be added here by JavaScript -->
+                  
                 </div>
                 
-                <!-- This is the *actual* text area the user types in. -->
                 <textarea id="input-area" autofocus></textarea>
             </div>
             
-            <!-- This container holds the "Back" and "Retry" buttons -->
             <div id="button-container">
                 <button id="back-btn">Back</button>
                 <button id="retry-btn" class="hidden">Retry</button>
             </div>
         </div>
 
-        <!-- This box shows the final results. It's hidden at the start. -->
         <div id="result-message" class="hidden">
-            <!-- Result message will be populated here by JavaScript -->
         </div>
 
     </div>
 
-    <!-- JavaScript starts here -->
+   
     <script>
-        // This line waits for the whole HTML page to load before running any JavaScript.
-        // This is important so we don't try to find buttons that don't exist yet.
+      
         document.addEventListener('DOMContentLoaded', () => {
         
-            // --- 1. Constants and Text Samples ---
-            
-            // A 'const' is a variable that never changes.
-            // This is an 'object'. Think of it like a dictionary or a container.
-            // It holds our 3 lists of sample texts.
+           
             const sampleTexts = {
                 easy: [
     "Typing every day helps your fingers learn the position of each key. Start slow and focus on accuracy. Steady practice leads to smooth movement and greater confidenc passages later.",
@@ -455,9 +430,6 @@
   ]
             };
 
-            // --- 2. Get References to HTML Elements ---
-            // We 'get' all the important HTML elements and store them in variables.
-            // This lets us control them with JavaScript (like hide, show, or change text).
             
             // Screens
             const difficultySelectionScreen = document.getElementById('difficulty-selection');
@@ -484,9 +456,7 @@
             const backButton = document.getElementById('back-btn');
 
 
-            // --- 3. State Variables ---
-            // 'let' means these are variables that CAN change.
-            // We use these to remember the "state" of the game (what's happening).
+          
             
             let timeLimit = 60;          // Default time. This will change based on difficulty.
             let countdownTimer;          // This will hold our 1-second timer.
@@ -499,189 +469,131 @@
             let selectedDifficulty = "easy"; // The chosen difficulty.
 
 
-            // --- 4. Core Functions ---
-            // Functions are blocks of code we can "call" (run) whenever we need to.
-
-            /**
-             * Shows the difficulty selection screen and hides the test.
-             * This is the starting point and also where the "Retry" and "Back" buttons lead.
-             */
+           
             function showDifficultyScreen() {
-                // Stop the 1-second countdown timer, just in case it's running.
+              
                 clearInterval(countdownTimer); 
-                isTestRunning = false; // The test is no longer running.
+                isTestRunning = false;
                 
-                // Hide the test and result elements by adding the ".hidden" class.
+              
                 resultMessageBox.classList.add('hidden');
                 typingTestScreen.classList.add('hidden');
                 retryButton.classList.add('hidden');
                 backButton.classList.add('hidden');
-                
-                // Show the difficulty selection screen by removing the ".hidden" class.
                 difficultySelectionScreen.classList.remove('hidden');
             }
             
-            /**
-             * Hides the difficulty screen and starts a new test.
-             * Called when a difficulty button is clicked.
-             */
+           
             function startTest(difficulty) {
-                // 1. Remember which difficulty was chosen.
                 selectedDifficulty = difficulty; 
                 
-                // 2. Set the time limit.
                 if (difficulty === 'hard') {
-                    timeLimit = 90; // Hard mode is 90 seconds.
+                    timeLimit = 90; 
                 } else {
-                    timeLimit = 60; // Easy and Medium are 60 seconds.
+                    timeLimit = 60;
                 }
                 
-                // 3. Hide the difficulty screen.
                 difficultySelectionScreen.classList.add('hidden');
-                
-                // 4. Show the typing test screen.
                 typingTestScreen.classList.remove('hidden');
-                
-                // 5. Show the "Back" button.
                 backButton.classList.remove('hidden');
-                
-                // 6. Reset all counters and load a new text.
                 resetTest(); 
             }
 
-            /**
-             * Resets all variables and UI elements for a new test.
-             */
             function resetTest() {
-                // Stop the timer.
                 clearInterval(countdownTimer);
                 isTestRunning = false;
-                
-                // Reset all our "memory" variables back to their starting values.
                 secondsLeft = timeLimit; 
                 charactersTypedSoFar = 0;
                 totalErrors = 0;
                 totalBackspaces = 0; 
 
-                // Reset the text on the screen.
                 timerText.innerText = secondsLeft; 
                 errorsText.innerText = '0';
                 backspaceText.innerText = '0';
                 accuracyText.innerText = '0%';
                 
-                // Clear the (invisible) text area.
                 hiddenTypingArea.value = '';
-                // Re-enable the text area so the user can type in it.
                 hiddenTypingArea.disabled = false;
                 
-                // Hide the result/retry buttons.
                 resultMessageBox.classList.add('hidden');
                 retryButton.classList.add('hidden');
                 
-                // Make sure the "Back" button is visible.
                 backButton.classList.remove('hidden');
 
-                // Load a new paragraph.
                 loadNewText(); 
                 
-                // Automatically "click" the invisible text area.
-                // This lets the user start typing right away without clicking first.
+             
                 hiddenTypingArea.focus();
             }
-
-            /**
-             * Selects a random text and fills the display area.
-             */
             function loadNewText() {
-                // 1. Get the list of texts for the chosen difficulty.
                 const texts = sampleTexts[selectedDifficulty];
                 
-                // 2. Pick a random number.
-                // Math.random() gives a random number like 0.123
-                // We multiply by the list length, then Math.floor() cuts off the decimal.
+                
                 const randomIndex = Math.floor(Math.random() * texts.length);
                 
-                // 3. Get the random text from the list.
                 currentTextToType = texts[randomIndex];
                 
-                // 4. Clear out any old text from the display box.
                 textDisplayBox.innerHTML = '';
                 
-                // 5. Turn the text string into a list of single characters.
-                // "Hi" -> ["H", "i"]
                 const characters = currentTextToType.split('');
                 
-                // 6. Loop through each character in the new list.
                 characters.forEach((char, index) => {
-                    // Create a new HTML element called <span>
                     const span = document.createElement('span');
-                    // Put the character inside the <span>. e.g. <span>H</span>
                     span.innerText = char;
-                    
-                    // If it's the very first character (index 0), add the 'cursor' class.
                     if (index === 0) {
                         span.classList.add('cursor'); 
                     }
                     
-                    // Add the new <span> to the display box.
                     textDisplayBox.appendChild(span);
                 });
             }
 
-            /**
-             * This function is called EVERY time the user types a key.
-             * This is the main "engine" of the app.
-             */
+          
             function checkTyping() {
-                // If the test is over, don't do anything.
+              
                 if (!isTestRunning && secondsLeft === 0) return;
 
-                // Get everything the user has typed so far from the invisible text area.
+             
                 const typedText = hiddenTypingArea.value; 
                 const textLength = typedText.length;
 
-                // 1. Start the timer
-                // We only start it if it's not already running AND
-                // the user is typing (not just backspacing).
+               
                 if (!isTestRunning && textLength > charactersTypedSoFar) { 
                     beginCountdown();
                 }
 
-                // Get all the character <span>s we created earlier.
                 const textSpans = textDisplayBox.querySelectorAll('span');
                 
-                // Update our count of typed characters.
                 charactersTypedSoFar = textLength;
-                let currentErrors = 0; // Reset error count for this check
-                let currentCursorPos = charactersTypedSoFar; // Where the cursor should be
+                let currentErrors = 0; 
+                let currentCursorPos = charactersTypedSoFar; 
 
-                // 2. Loop through each <span>
+               
                 textSpans.forEach((span, index) => {
-                    const typedChar = typedText[index]; // The character the user typed
-                    const sourceChar = span.innerText;  // The correct character
+                    const typedChar = typedText[index];
+                    const sourceChar = span.innerText; 
 
-                    // Clear any old styling (correct, incorrect, cursor)
+                   
                     span.className = '';
 
                     if (typedChar === undefined) {
-                        // This character hasn't been typed yet. Do nothing.
+                       
                     } else if (typedChar === sourceChar) {
-                        // This character is correct! Add the 'correct' class (makes it green).
+                       
                         span.classList.add('correct');
                     } else {
-                        // This character is wrong. Add the 'incorrect' class (makes it red).
+                       
                         span.classList.add('incorrect');
-                        currentErrors++; // Add to the error count
+                        currentErrors++; 
                     }
                 });
 
-                // 3. Update the cursor position
-                // Add the 'cursor' class to the *next* character to be typed.
+               
                 if (currentCursorPos < textSpans.length) {
                     textSpans[currentCursorPos].classList.add('cursor');
                 }
 
-                // 4. Update the metrics display
+               
                 totalErrors = currentErrors;
                 errorsText.innerText = totalErrors;
                 updateAccuracy(); // Recalculate and show the new accuracy
@@ -692,76 +604,64 @@
                 }
             }
             
-            /**
-             * This function is called when the user presses a key *down*.
-             * We use it to count backspaces.
-             */
+           
             function checkKeypress(event) {
-                // We only care about 'Backspace' and only if the test is running.
                 if (event.key === 'Backspace' && isTestRunning) {
-                    totalBackspaces++; // Add to the backspace count
-                    backspaceText.innerText = totalBackspaces; // Update the display
+                    totalBackspaces++; 
+                    backspaceText.innerText = totalBackspaces; 
                     
-                    // We must recalculate accuracy because backspace adds a penalty.
+                    
                     updateAccuracy(); 
                 }
             }
 
-            /**
-             * Calculates and updates the accuracy display.
-             */
+         
+
+
             function updateAccuracy() {
-                // 1. Get standard accuracy: (correct / total)
+
                 const correctTyped = charactersTypedSoFar - totalErrors;
-                // Check if totalTyped is 0 to avoid dividing by zero.
+
                 const accuracyPercent = charactersTypedSoFar === 0 ? 0 : (correctTyped / charactersTypedSoFar) * 100;
-                
-                // 2. Our custom penalty: -0.5% for each backspace
+      
                 const backspacePenalty = totalBackspaces * 0.5;
                 
-                // 3. Calculate final accuracy.
-                // Math.max(0, ...) ensures the accuracy never goes below 0%.
+              
                 const finalAccuracy = Math.max(0, accuracyPercent - backspacePenalty);
                 
-                // 4. Update the display with a rounded number (e.g., 95%).
+               
                 accuracyText.innerText = `${Math.round(finalAccuracy)}%`;
             }
 
-            /**
-             * Starts the 1-second countdown timer.
-             */
+            
             function beginCountdown() {
                 isTestRunning = true; // The test is now running!
                 
-                // 'setInterval' is a JavaScript command that runs a function
-                // every X milliseconds. (1000ms = 1 second)
+               
                 countdownTimer = setInterval(() => {
-                    secondsLeft--; // Subtract 1 from the time
-                    timerText.innerText = secondsLeft; // Update the display
+                    secondsLeft--;
+                    timerText.innerText = secondsLeft; 
                     
-                    // When time runs out...
+                   
                     if (secondsLeft === 0) {
-                        finishTest(); // End the test
+                        finishTest(); 
                     }
                 }, 1000); 
             }
 
-            /**
-             * Ends the test when the timer runs out or user finishes.
-             */
+           
             function finishTest() {
-                // Stop the 1-second timer.
+               
                 clearInterval(countdownTimer);
                 isTestRunning = false;
                 
-                // Disable the invisible text area so the user can't type anymore.
+                
                 hiddenTypingArea.disabled = true;
 
-                // Hide the "Back" button (test is over).
+               
                 backButton.classList.add('hidden');
 
-                // Remove the final cursor.
-                const cursorSpan = textDisplayBox.querySelector('.cursor');
+                                const cursorSpan = textDisplayBox.querySelector('.cursor');
                 if (cursorSpan) {
                     cursorSpan.classList.remove('cursor');
                 }
@@ -800,42 +700,30 @@
                     </div>
                 `;
                 
-                // Show the result message and the "Retry" button.
+                
                 resultMessageBox.classList.remove('hidden');
                 retryButton.classList.remove('hidden');
             }
-
-
-            // --- 5. Event Listeners ---
-            // This is where we "turn on" the buttons by telling them
-            // to listen for clicks.
-            
-            // When a difficulty button is clicked, call the startTest function.
             easyButton.addEventListener('click', () => startTest('easy'));
             mediumButton.addEventListener('click', () => startTest('medium'));
             hardButton.addEventListener('click', () => startTest('hard'));
             
-            // When the retry or back button is clicked, go to the difficulty screen.
+           
             retryButton.addEventListener('click', showDifficultyScreen);
             backButton.addEventListener('click', showDifficultyScreen);
             
-            // Listen for typing in the invisible text area.
             hiddenTypingArea.addEventListener('input', checkTyping);
-            // Listen for key presses (like Backspace).
             hiddenTypingArea.addEventListener('keydown', checkKeypress);
-    
-            // This lets the user click the *visible* text box
-            // to focus the *invisible* text area.
+   
             textDisplayBox.addEventListener('click', () => {
                 hiddenTypingArea.focus();
             });
 
-            // --- 6. Initial Setup ---
-            // This is the very first function that runs when the page loads.
-            // It shows the difficulty screen.
+           
             showDifficultyScreen();
         });
     </script>
 </body>
 </html>
+
 
